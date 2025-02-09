@@ -14,7 +14,6 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -237,7 +236,21 @@ public class DrawShapes extends JFrame
                 color = Color.RED;
 			}
 		});
-        
+        // green color
+        addToMenu(colorMenu, "Green", new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+				String text=e.getActionCommand();
+                System.out.println(text);
+                // change the color instance variable to green
+                color = Color.GREEN;
+                
+            }
+        });
+
+
+
+
+
         // blue color
         addToMenu(colorMenu, "Blue", new ActionListener() {
             public void actionPerformed(ActionEvent e) {
