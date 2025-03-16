@@ -1,11 +1,36 @@
 # cs220-drawshapes-sol
 
-## What to do
+## New Feature Added
 
-1. Add at least one more type of shape (triangle, star, polygon, etc)
-1. Allow the user to select shapes by clicking on them, or by clicking and dragging such as you would do on a desktop
-1. Selected shapes should be visually different (different color, highlighted border, etc)
-1. Allow the user to modify selected shapes by changing the color, location, and size of the shape
-1. Add some other features that sound exciting. Some possibilities include deleting shapes, re-ordering shapes, including new menu options, using keyboard events, supporting colors using hexadecimal RGB values, drawing arbitrary polygons formed by clicking a bunch of points, and so on.
-1. This is very important: Include some kind of help option that explains what all of the buttons do. If the user can't figure something out, then your company might not get paid (or in an academic setting you might get a bad grade).
-1. Make a Youtube video demonstrating the features of your DrawShapes assignment.
+1. **Custom Color Palette**  
+   Users can select a custom color using a color chooser (via the "Color Palette" option in the Color menu) so that shapes can be drawn in any color beyond the default presets.
+
+2. **Delete Shape with Delete/Backspace Key**  
+   Users can delete any selected shape by pressing the Delete key (or Backspace key), making it easier to remove unwanted shapes.
+
+3. **Undo/Redo Functionality**  
+   The application supports Undo and Redo actions for shape operations:
+   - **Undo:** Press **Ctrl+Z** to revert the last change.
+   - **Redo:** Press **Ctrl+Y** to reapply the last undone change.
+
+4. **Image Upload via Keyboard (I Key)**  
+   By pressing the **I key**, users can open a file chooser to select an image from their computer. The selected image is loaded onto the canvas as a shape (using an `ImageShape` class).
+
+## How to Use
+
+- **Drawing Shapes:**  
+  Click on the canvas to add shapes. You can choose the type of shape (Square, Circle, or Rectangle) from the Shape menu.
+
+- **Changing Colors:**  
+  Use the Color menu to select preset colors (Red, Green, Blue) or choose "Color Palette" for a custom color selection.
+
+- **Deleting Shapes:**  
+  Select a shape and press the **Delete** or **Backspace** key to remove it.
+
+- **Undo/Redo Actions:**  
+  - Press **Ctrl+Z** to undo an action.
+  - Press **Ctrl+Y** to redo an undone action.
+
+- **Uploading an Image:**  
+  Press the **I key** to open a file chooser, then select an image file. The image will appear on the canvas as a new shape.
+
