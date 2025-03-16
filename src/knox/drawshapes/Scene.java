@@ -7,11 +7,13 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Stack;
 
 /**
  * A scene of shapes. Uses the Model-View-Controller (MVC) design pattern,
@@ -28,6 +30,10 @@ public class Scene implements Iterable<IShape> {
     private SelectionRectangle selectRect;
     private boolean isDrag;
     private Point startDrag;
+
+    // Add undo/Redo stack
+    private Stack<List<IShape>> undoStack = new Stack<>();
+    private Stack<List<IShape>> redoStack = new Stack<>();
 
     public void updateSelectRect(Point drag) {
         for (IShape s : this) {
@@ -124,7 +130,9 @@ public class Scene implements Iterable<IShape> {
      * @param s
      */
     public void addShape(IShape s) {
+        saveStateForUndo(); // it saves current state before change
         shapeList.add(s);
+        redoStack.clear(); // clear redo history after new changes
     }
 
     /**
@@ -137,8 +145,10 @@ public class Scene implements Iterable<IShape> {
     }
 
     public void removeSelected() {
+        saveStateForUndo();
         // lambdas are SO FREAKING COOL!
         shapeList.removeIf(s -> s.isSelected());
+        redoStack.clear();
     }
 
     public String toString() {
@@ -218,5 +228,24 @@ public class Scene implements Iterable<IShape> {
 
     public void clear() {
         shapeList.clear();
+    }
+
+    public void undo() {
+        if (!undoStack.isEmpty()) {
+            redoStack.push(new ArrayList<>(shapeList)); // Save current state for Redo
+            shapeList = undoStack.pop();
+        }
+    }
+
+    public void redo() {
+        if (!redoStack.isEmpty()) {
+            undoStack.push(new ArrayList<>(shapeList)); // Save current state for Undo
+            shapeList = redoStack.pop();
+        }
+    }
+
+    // Helper method to save current state before making changes
+    private void saveStateForUndo() {
+        undoStack.push(new ArrayList<>(shapeList));
     }
 }

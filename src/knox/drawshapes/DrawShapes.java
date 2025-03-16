@@ -20,13 +20,52 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem; // for the color pallet
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
 
 @SuppressWarnings("serial")
 public class DrawShapes extends JFrame {
+
     private enum ShapeType {
         SQUARE,
         CIRCLE,
         RECTANGLE
+    }
+
+    public class ImageShape extends AbstractShape {
+
+        private BufferedImage image;
+        private int width;
+        private int height;
+
+        public ImageShape(String imagePath, Point anchorPoint, int width, int height) {
+            super(anchorPoint, Color.WHITE); // Color isn't used for images
+            try {
+                image = ImageIO.read(new File(imagePath));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            this.width = width;
+            this.height = height;
+            // Set a bounding box for selection; adjust as needed
+            boundingBox = new BoundingBox(anchorPoint.x, anchorPoint.x + width, anchorPoint.y, anchorPoint.y + height);
+        }
+
+        public void draw(Graphics g) {
+            if (image != null) {
+                g.drawImage(image, getAnchorPoint().x, getAnchorPoint().y, width, height, null);
+            }
+        }
+
+        public void scale(double factor) {
+            width = (int) (width * factor);
+            height = (int) (height * factor);
+        }
+
+        public String toString() {
+            return "IMAGE " + getAnchorPoint().x + " " + getAnchorPoint().y + " " + width + " " + height;
+        }
     }
 
     private DrawShapesPanel shapePanel;
@@ -176,6 +215,26 @@ public class DrawShapes extends JFrame {
                 }
             }
         });
+
+        JMenu editMenu = new JMenu("Edit");
+        menuBar.add(editMenu);
+
+        // Undo
+        JMenuItem undoItem = new JMenuItem("Undo");
+        editMenu.add(undoItem);
+        undoItem.addActionListener(e -> {
+            scene.undo();
+            repaint();
+        });
+
+        // Redo
+        JMenuItem redoItem = new JMenuItem("Redo");
+        editMenu.add(redoItem);
+        redoItem.addActionListener(e -> {
+            scene.redo();
+            repaint();
+        });
+
         // save
         JMenuItem saveItem = new JMenuItem("Save");
         fileMenu.add(saveItem);
@@ -214,7 +273,6 @@ public class DrawShapes extends JFrame {
 
         // OK, it's annoying to create menu items this way,
         // so let's use a helper method
-
         // color menu
         JMenu colorMenu = new JMenu("Color");
         menuBar.add(colorMenu);
@@ -251,7 +309,6 @@ public class DrawShapes extends JFrame {
         });
 
         // Custom Color Menu
-
         JMenuItem customColorItem = new JMenuItem("Color Palette");
         colorMenu.add(customColorItem);
         customColorItem.addActionListener(new ActionListener() {
@@ -349,10 +406,37 @@ public class DrawShapes extends JFrame {
             public void keyPressed(KeyEvent e) {
                 // Called when you push a key down
                 System.out.println("key pressed: " + e.getKeyChar());
+
+                if (e.isControlDown()) {
+                    if (e.getKeyCode() == KeyEvent.VK_Z) { // Ctrl + Z for Undo
+                        scene.undo();
+                        repaint();
+                        System.out.println("Undo pressed");
+                        return;
+
+                    } else if (e.getKeyCode() == KeyEvent.VK_Y) { // Ctrl + Y for Redo
+                        scene.redo();
+                        repaint();
+                        System.out.println("Redo pressed");
+                        return;
+                    }
+
+                }
                 if (e.getKeyCode() == KeyEvent.VK_LEFT) {
                     scene.moveSelected(-50, 0);
                 } else if (e.getKeyCode() == KeyEvent.VK_UP) {
                     scene.moveSelected(0, -50);
+                }
+                // Image upload with the I key
+                if (e.getKeyCode() == KeyEvent.VK_I) {
+                    javax.swing.JFileChooser fileChooser = new javax.swing.JFileChooser();
+                    int returnVal = fileChooser.showOpenDialog(null);
+                    if (returnVal == javax.swing.JFileChooser.APPROVE_OPTION) {
+                        File selectedFile = fileChooser.getSelectedFile();
+                        String imagePath = selectedFile.getAbsolutePath();
+                        scene.addShape(new ImageShape(imagePath, new Point(100, 100), 100, 100));
+                        System.out.println("Image upload: " + imagePath);
+                    }
                 }
                 repaint();
             }
@@ -371,6 +455,7 @@ public class DrawShapes extends JFrame {
                 }
                 repaint();
             }
+
         });
     }
 
